@@ -139,7 +139,7 @@ public class CrookedCourseTest {
             }
 
             @Test
-            @DisplayName("when a duplicate difficulty Level exists")
+            @DisplayName("when a duplicate difficulty Level exists for that Rabbit")
             void courseDeclinesPerformancesWhenDuplicateLevelExists() {
                 try {
                     course.addRabbit(rabbits.get("Bronson"));
@@ -150,7 +150,6 @@ public class CrookedCourseTest {
                 }
             }
         }
-
 
     }
 }
