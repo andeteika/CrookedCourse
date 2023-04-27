@@ -1,6 +1,7 @@
 package crookedCourse;
 
-// TODO: Implement Performance record.
+// TODO: Implement Performance score() method.
+
 /**
  * The Performance is used to distinguish the different performances of a rabbit in the crooked course.
  */

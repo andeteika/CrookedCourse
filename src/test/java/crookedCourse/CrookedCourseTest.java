@@ -13,11 +13,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Crooked Course")
 @ExtendWith(RabbitsParameterResolver.class)
@@ -54,7 +51,7 @@ public class CrookedCourseTest {
 
     @Nested
     @DisplayName("adding Rabbit")
-    class AfterAddingRabbits {
+    class AddingRabbits {
 
         @Test
         @DisplayName("contains two Rabbits when two Rabbits are added")
@@ -65,74 +62,95 @@ public class CrookedCourseTest {
         }
 
         @Test
-        @DisplayName("contains Rabbits but not Scores")
+        @DisplayName("contains Rabbit but not Performances")
         void courseContainsRabbitsButNotRaceScores() {
             course.addRabbit(rabbits.get("Bronson"), rabbits.get("Abraham"), rabbits.get("Niles"));
             Map<Rabbit, Set<Performance>> records = course.getRecords();
             records.forEach((rabbit, scores) -> assertTrue(scores.isEmpty(), "Rabbit should not contain scores."));
         }
 
-        @Test
-        @DisplayName("returns an immutable Records Map for the client")
-        void courseRecordsReturnedShouldBeImmutableForTheClient() {
-            Map<Rabbit, Set<Performance>> records = course.getRecords();
-            try {
-                records.put(rabbits.get("Bronson"), new HashSet<>());
-                fail();
-            } catch (Exception exception) {
-                assertTrue(exception instanceof UnsupportedOperationException, "Should throw UnsupportedOperationException.");
-            }
-        }
+        @Nested
+        @DisplayName("declines Rabbit")
+        class DeclineRabbits {
 
-        @Test
-        @DisplayName("declines the entry if a Rabbit is unlawful")
-        void courseRefrainsTheAddingOfUnlawfulRabbits() {
-            try {
-                Rabbit paddy = new Rabbit(
-                        new Contestant("Mario Stallone", LocalDate.of(2006, Month.NOVEMBER, 24)),
-                        "Paddy", LocalDate.of(2023, Month.MARCH, 21), true);
-                course.addRabbit(paddy);
-                fail();
-            } catch (Exception exception) {
-                assertTrue(exception instanceof IllegalArgumentException, "Should throw IllegalArgumentException.");
+            @Test
+            @DisplayName("when the Rabbit is unlawful")
+            void courseRefrainsTheAddingOfUnlawfulRabbits() {
+                try {
+                    Rabbit paddy = new Rabbit(new Contestant("Mario Stallone", LocalDate.of(2006, Month.NOVEMBER, 24)), "Paddy", LocalDate.of(2023, Month.MARCH, 21), true);
+                    course.addRabbit(paddy);
+                    fail();
+                } catch (Exception exception) {
+                    assertTrue(exception instanceof IllegalArgumentException, "Should throw IllegalArgumentException.");
+                }
             }
-        }
 
-        @Test
-        @DisplayName("declines the entry if the Owner of a Rabbit is unlawful")
-        void courseRefrainsTheAddingOfRabbitsWithUnlawfulOwners() {
-            try {
-                Rabbit grace = new Rabbit(
-                        new Contestant("Loren Gray", LocalDate.of(2020, Month.APRIL, 23)),
-                                "Grace", LocalDate.of(2020, Month.JULY, 12), true);
-                course.addRabbit(grace);
-                fail();
-            } catch (Exception exception) {
-                assertTrue(exception instanceof IllegalArgumentException, "Should throw IllegalArgumentException.");
+            @Test
+            @DisplayName("when the owner of the Rabbit is unlawful")
+            void courseRefrainsTheAddingOfRabbitsWithUnlawfulOwners() {
+                try {
+                    Rabbit grace = new Rabbit(new Contestant("Loren Gray", LocalDate.of(2020, Month.APRIL, 23)), "Grace", LocalDate.of(2020, Month.JULY, 12), true);
+                    course.addRabbit(grace);
+                    fail();
+                } catch (Exception exception) {
+                    assertTrue(exception instanceof IllegalArgumentException, "Should throw IllegalArgumentException.");
+                }
             }
         }
     }
 
+    @Test
+    @DisplayName("returns an immutable Records Map for the client")
+    void courseRecordsReturnedShouldBeImmutableForTheClient() {
+        Map<Rabbit, Set<Performance>> records = course.getRecords();
+        try {
+            records.put(rabbits.get("Bronson"), new HashSet<>());
+            fail();
+        } catch (Exception exception) {
+            assertTrue(exception instanceof UnsupportedOperationException, "Should throw UnsupportedOperationException.");
+        }
+    }
+
     @Nested
-    @DisplayName("in progress")
-    class inProgress {
+    @DisplayName("adding Performances")
+    class RecorderPerformance {
 
         @Test
-        @DisplayName("is 0% completed and 100% to-define when no rabbit is added yet")
-        void progress100PercentToInsert() {
-            Progress progress = course.progress();
-            assertThat(progress.completed()).isEqualTo(0);
-            assertThat(progress.toRace()).isEqualTo(100);
+        @DisplayName("to a Rabbit already enrolled")
+        void courseRecordsThePerformancesOfTheRabbit() {
+            course.addRabbit(rabbits.get("Bronson"));
+            course.recordPerformance(rabbits.get("Bronson"), new Performance(Performance.Levels.EASY, 3, 230), new Performance(Performance.Levels.MEDIUM, 4, 260));
+            assertThat(course.getRecords().get(rabbits.get("Bronson"))).hasSize(2);
         }
 
-        @Test
-        @DisplayName("is 40% completed and 60% to-define when 2 rabbits raced and 3 haven't yet")
-        void progressWith40PercentCompletedAnd60PercentToDefine() {
-            course.addRabbit();
-            Progress progress = course.progress();
-            assertThat(progress.completed()).isEqualTo(40);
-            assertThat(progress.toRace()).isEqualTo(60);
+        @Nested
+        @DisplayName("declines entries")
+        class DeclinePerformances {
+
+            @Test
+            @DisplayName("when the Rabbit was not enrolled first")
+            void courseDeclinesThePerformancesWhenTheRabbitIsNotEnrolledIn() {
+                try {
+                    course.recordPerformance(rabbits.get("Bronson"), new Performance(Performance.Levels.EASY, 3, 230));
+                    fail();
+                } catch (Exception exception) {
+                    assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+                }
+            }
+
+            @Test
+            @DisplayName("when a duplicate difficulty Level exists")
+            void courseDeclinesPerformancesWhenDuplicateLevelExists() {
+                try {
+                    course.addRabbit(rabbits.get("Bronson"));
+                    course.recordPerformance(rabbits.get("Bronson"), new Performance(Performance.Levels.EASY, 3, 230), new Performance(Performance.Levels.EASY, 4, 260));
+                    fail();
+                } catch (Exception exception) {
+                    assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+                }
+            }
         }
+
 
     }
 }
