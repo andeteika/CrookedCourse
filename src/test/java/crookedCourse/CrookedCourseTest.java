@@ -1,5 +1,6 @@
 package crookedCourse;
 
+import crookedCourse.resolver.PerformanceParameterResolver;
 import crookedCourse.resolver.RabbitsParameterResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,15 +19,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Crooked Course")
 @ExtendWith(RabbitsParameterResolver.class)
+@ExtendWith(PerformanceParameterResolver.class)
 public class CrookedCourseTest {
 
     private CrookedCourse course;
     private Map<String, Rabbit> rabbits;
+    private Map<String, Performance> performances;
 
     @BeforeEach
-    void init(Map<String, Rabbit> rabbits) {
+    void init(Map<String, Rabbit> rabbits, Map<String, Performance> performances) {
         course = new CrookedCourse();
         this.rabbits = rabbits;
+        this.performances = performances;
     }
 
     @Nested
@@ -119,7 +123,7 @@ public class CrookedCourseTest {
         @DisplayName("to a Rabbit already enrolled")
         void courseRecordsThePerformancesOfTheRabbit() {
             course.addRabbit(rabbits.get("Bronson"));
-            course.recordPerformance(rabbits.get("Bronson"), new Performance(Performance.Levels.EASY, 3, 230), new Performance(Performance.Levels.MEDIUM, 4, 260));
+            course.recordPerformance(rabbits.get("Bronson"), performances.get("Legit Easy Performance"), performances.get("Legit Medium Performance"));
             assertThat(course.getRecords().get(rabbits.get("Bronson"))).hasSize(2);
         }
 
@@ -131,7 +135,7 @@ public class CrookedCourseTest {
             @DisplayName("when the Rabbit was not enrolled first")
             void courseDeclinesThePerformancesWhenTheRabbitIsNotEnrolledIn() {
                 try {
-                    course.recordPerformance(rabbits.get("Bronson"), new Performance(Performance.Levels.EASY, 3, 230));
+                    course.recordPerformance(rabbits.get("Bronson"), performances.get("Legit Easy Performance"), performances.get("Legit Medium Performance"));
                     fail();
                 } catch (Exception exception) {
                     assertThat(exception).isInstanceOf(IllegalArgumentException.class);
@@ -143,7 +147,7 @@ public class CrookedCourseTest {
             void courseDeclinesPerformancesWhenDuplicateLevelExists() {
                 try {
                     course.addRabbit(rabbits.get("Bronson"));
-                    course.recordPerformance(rabbits.get("Bronson"), new Performance(Performance.Levels.EASY, 3, 230), new Performance(Performance.Levels.EASY, 4, 260));
+                    course.recordPerformance(rabbits.get("Bronson"), performances.get("Legit Easy Performance"), performances.get("Legit Easy Performance"));
                     fail();
                 } catch (Exception exception) {
                     assertThat(exception).isInstanceOf(IllegalArgumentException.class);

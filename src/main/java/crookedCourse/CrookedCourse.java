@@ -56,8 +56,8 @@ public class CrookedCourse {
             Set<Performance> scores = performances.get(rabbit);
             for (Performance performanceToAdd : performancesToAdd) {
                 for (Performance score : scores) {
-                    if (score.level() == performanceToAdd.level())
-                        throw new IllegalArgumentException("Rabbit " + rabbit.name() + " already has a " + performanceToAdd.level() + " level score.");
+                    if (score.getLevel() == performanceToAdd.getLevel())
+                        throw new IllegalArgumentException("Rabbit " + rabbit.name() + " already has a " + performanceToAdd.getLevel() + " level score.");
                 }
                 scores.add(performanceToAdd);
             }
