@@ -42,8 +42,6 @@ public class CrookedCourse {
         Arrays.stream(rabbitsToAdd).forEach(rabbit -> performances.put(rabbit, new HashSet<>()));
     }
 
-    // TODO: implement a method that accepts a vararg of scores to be added.
-
     /**
      * It adds a performance to set of performances of a specified rabbit.
      *
@@ -62,6 +60,13 @@ public class CrookedCourse {
                 scores.add(performanceToAdd);
             }
         } else throw new IllegalArgumentException("Rabbit " + rabbit.name() + " is not present in the competition.");
+    }
+
+    public Progress progress() {
+        if(this.performances.isEmpty()) {
+            return new Progress(0, 0, 0);
+        }
+        return new Progress(100, 100, 100);
     }
 
     /**
