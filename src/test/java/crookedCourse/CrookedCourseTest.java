@@ -157,30 +157,4 @@ public class CrookedCourseTest {
 
     }
 
-    @Nested
-    @DisplayName("Progress")
-    class inProgress {
-
-        @Nested
-        @DisplayName("is 0% raced 0% racing and 100% to race")
-        class progress0PercentComplete100ToComplete {
-
-            @Test
-            @DisplayName("when the crooked course is empty")
-            void progressIsNoneWhenTheCrookedCourseIsEmptyWithNoRabbitEntries() {
-                assertThat(course.progress().raced()).isEqualTo(0);
-                assertThat(course.progress().racing()).isEqualTo(0);
-                assertThat(course.progress().toRace()).isEqualTo(0);
-            }
-
-            @Test
-            @DisplayName("when Rabbits without performance are enrolled")
-            void progressIsNoneWhenOnlyRabbitsAreEnteredWithoutPerformances() {
-                assertThat(course.progress().raced()).isEqualTo(0);
-                assertThat(course.progress().racing()).isEqualTo(0);
-                assertThat(course.progress().toRace()).isEqualTo(0);
-            }
-        
-        }
-    }
 }

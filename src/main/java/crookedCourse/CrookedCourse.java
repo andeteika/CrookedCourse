@@ -62,12 +62,6 @@ public class CrookedCourse {
         } else throw new IllegalArgumentException("Rabbit " + rabbit.name() + " is not present in the competition.");
     }
 
-    public Progress progress() {
-        if(this.performances.isEmpty()) {
-            return new Progress(0, 0, 0);
-        }
-        return new Progress(100, 100, 100);
-    }
 
     /**
      * Returns a String representation of the crooked course.
